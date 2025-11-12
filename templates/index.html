@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>HANDZ Punch Clock</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+        <link rel="stylesheet" href="static/styles.css">
+        <link rel="icon" type="image/x-icon" href="/static/images/Logo v2 256x256.ico">
+    </head>
+
+    <body>
+        <div id="header">
+                <div id="branchName">
+                    <p id="currentBranch">{{ currentBranch }}</p>
+                </div>
+            <div class="headerItems">
+                <div id="headerDirectory">
+                    <input type="text" id="userID", placeholder="{{ folder_path }}">
+                    <button id="editButton"><img src="static/images/Edit icon.png"></button>
+                    <div id="nameCheckDiv">
+                        <div class="nameCheckCircle", id="nameCheckExterior">
+                            <div class="nameCheckCircle", id="nameCheckInterior">{{ teacherNameCount }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="headerItems"></div>
+                <div id="headerDatetime">
+                    <div id="datetime">Loading time...</div>
+                </div>
+            </div>
+        </div>
+        <div id="changeableContentSpace">
+            <!-- Main page START -->
+            <div id="mainPage">
+                <div id="leftSide">
+                    <canvas id="myCanvas" class="imgBuffer">
+                        <div id="camera" alt="Camera feed"></div>
+                    </canvas>
+                    <div id="errorLog"></div>
+                </div>
+                <div id="rightSide">
+                    <div class="rightSideDiv">
+                        <div id="message">Place your ID near the camera to scan</div>
+                    </div>
+                    <div class="rightSideDiv">
+                        <img src="static/images/ID card example male (no text).png" height="200px" alt="ID card example"></img>
+                    </div>
+                    <div class="rightSideDiv">
+                        <button class="smallButton blueButton", id="missingIDButton">Forgot your ID?</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Main page FINISH -->
+        </div>
+        <div id="disclaimer">        
+            <p>HANDZ Punch Clock developed by Dakota Teears for HANDZ English School ・ 2025</p>
+        </div>
+        <div id="teacherNamesDataPass", data-value="{{ teacherNames }}"></div>
+        <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script src="static/script.js"></script>
+    </body>
+</html>

@@ -1,0 +1,497 @@
+/* Universal stylings */
+html, body {
+  height: 100%;
+  font-family: "gadugi";
+  overflow: hidden;
+}
+
+/* Top part stylings */
+#changeableContentSpace {
+  height: 70%;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Header stylings */
+#header {
+  height: 20%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#branchName {
+  position: absolute;
+  top: -80px;
+  left: 40px;
+  font-family: 'Bebas Neue';
+  font-weight: bolder;
+  font-size: 100px;
+  color: #00B4D8;
+  opacity: 50%;
+}
+
+#headerDirectory {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+#editButton {
+  border: none;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  background-color: #00B4D8;
+}
+
+#editButton:hover {
+  background-color: #009dbc;
+}
+
+#editButton img {
+  height: 100%; 
+  max-height: 20px;
+  margin: 4px;
+}
+
+#headerDirectory input {
+  height: 100%;
+  max-height: 20px;
+  padding: 5px;
+  width: 30%;
+  border: none;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+  pointer-events: none;
+  /* Optional: Add visual cues to indicate it's disabled */
+  background-color: #f0f0f0; /* Light gray background */
+  cursor: default; /* Change cursor to default arrow */
+}
+
+#nameCheckDiv {
+  padding-left: 15px;
+}
+
+.nameCheckCircle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+#nameCheckExterior {
+  width: 35px;
+  height: 35px;
+  background-color: green;
+}
+
+#nameCheckInterior {
+  width: 30px;
+  height: 30px;
+  background-color: white;
+  color: green;
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+#headerDatetime {
+  display: flex;
+  justify-content: center;
+}
+
+#datetime {
+  white-space: nowrap;
+  font-size: xx-large;
+  font-weight: bold;
+}
+
+#editButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Footer stylings */
+#disclaimer {
+  display: flex;
+  justify-content: center;
+  height: 10%;
+}
+
+#disclaimer p {
+  color: rgb(200, 200, 200);
+}
+
+/* Main stylings */
+#mainPage {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#mainPage div {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.imgBuffer {
+  width: 90%;
+  height: 81%;
+  max-width: 640px;
+  max-height: 480px;
+}
+
+#camera video {
+    width: 100%;
+    height: 75%;
+}
+
+#errorLog {
+  height: 10%;
+  text-align: center;
+  color: red;
+}
+
+#rightSide {
+  text-align: center;
+}
+
+.rightSideDiv {
+  padding-top: 15px;
+}
+
+#message {
+  font-size: large; 
+}
+
+/* Secondary stylings */
+
+
+#employeeNameDiv {
+  display: flex;
+  justify-content: center;
+}
+
+.secondaryText {
+  margin: 5px;
+  white-space: nowrap;
+  font-size: x-large;
+  font-weight: bold;
+}
+
+#secondaryErrorMessage {
+  color: red;
+}
+
+.secondaryButtonsDiv {
+  min-width: 400px;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.secondaryButtonsDiv button {
+  margin-left: 40px;
+  margin-right: 40px;
+}
+
+#secondaryBackButtonDiv {
+  justify-content: center;
+}
+
+#date {
+  display: flex;
+  justify-content: center;
+}
+
+/* New secondary stylings */
+#secondaryPage {
+  font-family: gadugi;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#secondaryTextDiv {
+  height: 15%;
+  text-align: center;
+}
+
+#timesheetBoxesDiv1 {
+  height: 20%;
+  margin-top: 10px;
+}
+
+#arrowDiv {
+  height: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#timesheetBoxesDiv2 {
+  height: 20%;
+}
+
+#timesheetBoxesDiv3 {
+  height: 15%;
+  margin-top: -4px;
+}
+
+#timesheetBoxesDiv4 {
+  height: 20%;
+}
+
+#timesheetBoxesDiv1 .timesheetCell {
+  background-color: lightgray;
+}
+
+.timesheetBox {
+  display: flex;
+  justify-content: center;
+}
+
+.timesheetCell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 100px;
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+}
+
+.timesheetCell.topRow {
+  font-weight: bold;
+}
+
+.bottomRow {
+  border-bottom: 1px solid black;
+}
+
+.lastCell {
+  border-right: 1px solid black;
+  width: 200px;
+}
+
+#punchButtons {
+  width: 604px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+#punchButtons button {
+  width: 101px;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  transition-duration: 0.4s;
+  border: none;
+}
+
+#clockIn {
+  border-bottom-left-radius: 10px;
+}
+
+#clockOut {
+  border-bottom-right-radius: 10px;
+}
+
+.goodButton {
+  height: 100%;
+  background-color: #07c1e6;
+  pointer-events: none;
+}
+
+.badButton {
+  height: 70%;
+  background-color: gray;
+}
+
+.punchImg {
+  height: 90%;
+  width: 60%;
+}
+
+.badButton:hover {
+  background-color: #585858;
+}
+
+#newSubmitButtonDiv {
+  margin-top: 20px;
+}
+
+#newSubmitButton {
+  height: 50px;
+  width: 200px;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  border: none;
+  background-color: #00aa00;
+  padding: 15px 32px;
+  transition-duration: 0.4s;
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#newSubmitButton:hover {
+  background-color: #008000;
+}
+
+#editableNotesDiv {
+  height: 87%;
+  width: 97%;
+  font-size: 110%;
+  border: none;
+}
+
+#editableNotesDiv:focus {
+  outline: none;
+}
+
+/* Third stylings */
+#thirdPage {
+  font-family: gadugi;
+  width: 50%;
+}
+
+#thirdTextDiv {
+  text-align: center;
+}
+
+.thirdText {
+  margin: 5px;
+  font-size: x-large;
+}
+
+#thirdBackButtonDiv {
+  display: flex;
+  justify-content: center;
+}
+
+#fillBarDiv {
+  display: flex;
+  justify-content: center;
+  height: 30px;
+  margin-top: 50px;
+  margin-bottom: 20px;
+}
+
+#fillBar {
+  width: 40%;
+  height: 100%;
+}
+
+#submitButtonDiv {
+  width: 10%;
+  height: 100%;
+}
+
+#fillBar input {
+  min-height: 24px;
+  width: 97%;
+  font-size: 120%;
+  text-transform: uppercase;
+}
+
+/* Button stylings */
+button:hover {
+  cursor: pointer;
+}
+
+.verySmallButton {
+  max-height: 40px;
+  min-height: 30px;
+  background-color: white;
+  border: 2px solid black;
+  color: black;
+  padding: 8px 16px;
+  font-size: 16px;
+  border-radius: 10px;
+  transition-duration: 0.4s;
+  margin-top: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.verySmallButton:hover {
+  background-color: lightgray;
+}
+
+.smallButton {
+  max-height: 60px;
+  min-height: 40px;
+  background-color: white;
+  border: 2px solid black;
+  color: black;
+  padding: 15px 32px;
+  font-size: 16px;
+  border-radius: 10px;
+  transition-duration: 0.4s;
+  margin: 10px;
+}
+
+.bigButton {
+  height: 60px;
+  width: 140px;
+  background-color: white;
+  border: 2px solid black;
+  color: black;
+  padding: 15px 32px;
+  font-size: 16px;
+  border-radius: 10px;
+  transition-duration: 0.4s;
+  margin: 10px;
+}
+
+.blueButton:hover {
+  background-color: #009dbc;
+}
+
+.greyButton:hover {
+  background-color: lightgray;
+}
+
+#backButton img {
+  height: 100%; 
+  max-height: 12px;
+  margin: 2px;
+}
+
+#submitButton {
+  height: 100%;
+  border: none;
+  background-color: #00B4D8;
+  padding: 15px 32px;
+  transition-duration: 0.4s;
+  border-radius: 2%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#submitButton img {
+  height: 20px;
+  object-fit: contain;
+}
+
+#submitButton:hover {
+  background-color: #0087bc;
+}
