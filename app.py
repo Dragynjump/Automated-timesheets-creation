@@ -10,6 +10,10 @@ from tkinter import filedialog
 
 """
 CURRENT BUGS
+update route is not returning valid response for some reason
+
+
+
 Hours worked calculated in JavaScript throws a NaN value if the value in the clock in slot is anything other than a valid timestamp
 Needs to change to an empty value
 Indexing into the worksheets has been updated to use less code. It's a little more hardcoded now, so I'll need to keep an eye out
@@ -22,7 +26,9 @@ base_dir = '.'
 if hasattr(sys, '_MEIPASS'):
     base_dir = os.path.join(sys._MEIPASS)
 
-app = Flask(__name__, static_folder=os.path.join(base_dir, 'static'), template_folder=os.path.join(base_dir, 'templates'))
+# APP DECLARATION
+#app = Flask(__name__, static_folder=os.path.join(base_dir, 'static'), template_folder=os.path.join(base_dir, 'templates'))
+app = Flask(__name__,template_folder="templates")
 
 # Collect screen dimension info
 root = tk.Tk()
@@ -36,8 +42,10 @@ teacherNameCount = 0
 
 # Get current time and dates, store as variables
 currentTime = dt.datetime.now()
-currentMonthYear = currentTime.strftime("%B") + " " + currentTime.strftime("%Y")
+#currentMonthYear = currentTime.strftime("%B") + " " + currentTime.strftime("%Y")
 monthArray = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+monthArrayCaps = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+currentMonthYear = monthArrayCaps[currentTime.month - 1] + " " + str(currentTime.year)
 # Set folder path for completed spreadsheets
 yearRange = ""
 if currentTime.month < 4:
@@ -47,13 +55,15 @@ if currentTime.month < 4:
         yearRange = str(currentTime.year - 1) + "-" + str(currentTime.year)
 else:
     yearRange = str(currentTime.year) + "-" + str(currentTime.year + 1)
-namingConvention = " - Work Hours - " + yearRange
-namingConventionAdjusted = namingConvention + " (Punch Clock)" + ".xlsx"
-folder_path = "G:/My Drive/For Branch Managers/HANDZ Punch Clock/Work Hours & Transport Sheets " + yearRange
-currentBranch = "SK"
+namingConvention = " - Work Hours and Transportation - " + yearRange + ".xlsx"
+folder_path = "G:/My Drive/Teachers Folder/Work Hours NEW FORMAT " + yearRange
+# Get formatted date for searching through timesheets
+formattedDate = currentTime.strftime("%d") + "-" + currentTime.strftime("%m") + "-" + currentTime.strftime("%Y")
+stringFormat = "%d-%m-%Y"
+stringDatetimeObj = dt.datetime.strptime(formattedDate, stringFormat)
 
-# APP DECLARATION
-app = Flask(__name__,template_folder="templates")
+# CHANGE FOR EACH VERSION!!!!!!
+currentBranch = "SK"
 
 # MAIN FUNCTIONS
 def findTeacherNames():
@@ -69,8 +79,8 @@ def findTeacherNames():
             if os.path.isfile(item_path):
                 fileName = f"{item}"
                 #Only read necessary files
-                if fileName[len(fileName) - len(namingConventionAdjusted): len(fileName)] == namingConventionAdjusted:
-                    teacherName = fileName[0:len(fileName) - (len(namingConventionAdjusted))]
+                if fileName[len(fileName) - len(namingConvention): len(fileName)] == namingConvention:
+                    teacherName = fileName[0:len(fileName) - (len(namingConvention))]
                     teacherNames.append(teacherName)
                     teacherNameCount = teacherNameCount + 1
     except FileNotFoundError:
@@ -78,38 +88,28 @@ def findTeacherNames():
 def findUserTimesheet(userName):
     #After username is retrieved, copy teacher's excel file into openpyxl workbook, then store current sheet into a dataframe
     try:
-        wb = op.load_workbook(f'{folder_path}/{userName}{namingConventionAdjusted}', data_only = True)
+        wb = op.load_workbook(f'{folder_path}/★{userName}{namingConvention}', data_only = True)
     except FileNotFoundError:
         return False
     return wb
-def insertPunchTime(workSheet, clIn, clOut, hrs, brnch, notes):
+def insertPunchTime(workSheet, clIn, clOut, brnch, notes):
     # Define variables for cell search (time, rows, columns, etc.)
     maxRow = workSheet.max_row
-    maxColumn = workSheet.max_column
-    formattedDate = currentTime.strftime("%d") + "-" + currentTime.strftime("%m") + "-" + currentTime.strftime("%Y")
-    stringFormat = "%d-%m-%Y"
-    stringDatetimeObj = dt.datetime.strptime(formattedDate, stringFormat)
 
     # Search for current date and fill in current time for punch clock
-    attempts = 0
     for i in range (1, maxRow + 1):
         if workSheet.cell(row = i, column = 1).value == stringDatetimeObj:
             # Insert clock in time
             workSheet.cell(row = i, column = 3).value = clIn
             # Insert clock out time
-            workSheet.cell(row = i, column = 5).value = clOut
-            # Insert hrs worked
-            workSheet.cell(row = i, column = 6).value = hrs
-            # Insert branch location
-            workSheet.cell(row = i, column = 9).value = brnch
+            workSheet.cell(row = i, column = 4).value = clOut
             # Insert notes
-            workSheet.cell(row = i, column = 11).value = notes
-            break
-        else:
-            attempts = attempts + 1
-        if attempts == maxRow + 1:
-            return False
-
+            workSheet.cell(row = i, column = 5).value = notes
+            # Insert branch location
+            workSheet.cell(row = i, column = 13).value = brnch
+            return True
+    return False
+    """
     # Initialize variables
     totalWorkHours = 0
     totalPlusHours = 0
@@ -141,7 +141,11 @@ def insertPunchTime(workSheet, clIn, clOut, hrs, brnch, notes):
             if workSheet.cell(row = x, column = 9).value is not None:
                 totalDaysWorked = totalDaysWorked + 1
     return True
-
+    """
+def findExcelFileInFolder(folder_path, namingConvention):
+    # Copy teacher's excel file into openpyxl workbook, then store current sheet into a dataframe
+    wb = op.load_workbook(f'{folder_path}/{namingConvention}.xlsx', data_only = True)
+    return wb
 def checkTotalWorkTime(clockInTime):
     clockInHour = ""
     # Turn clock in time into useable integer, or just the hour if time object
@@ -163,57 +167,53 @@ def checkTotalWorkTime(clockInTime):
 def checkRecentData(workSheet):
     # Define variables for cell search (time, rows, columns, etc.)
     maxRow = workSheet.max_row
-    maxColumn = workSheet.max_column
     formattedDate = currentTime.strftime("%d") + "-" + currentTime.strftime("%m") + "-" + currentTime.strftime("%Y")
     stringFormat = "%d-%m-%Y"
     stringDatetimeObj = dt.datetime.strptime(formattedDate, stringFormat)
 
     # Search for current date and fill in current time for punch clock
     for i in range (1, maxRow + 1):
-        for j in range (1, maxColumn + 1):
-            if workSheet.cell(row = i, column = j).value == stringDatetimeObj:
-                recentDataObject = {
-                    # Retrieve clock in time
-                    "clockin": str(workSheet.cell(row = i, column = j + 1).value),
-                    # Retrieve clock in time
-                    "clockout": str(workSheet.cell(row = i, column = j + 3).value),
-                    # Retrieve branch location
-                    "hours": str(workSheet.cell(row = i, column = j + 4).value),
-                    # Retrieve branch location
-                    "branch": str(workSheet.cell(row = i, column = j + 7).value),
-                    # Retrieve branch location
-                    "notes": str(workSheet.cell(row = i, column = j + 9).value)
-                }
-                for item in recentDataObject:
-                    if recentDataObject[item] == "None":
-                        recentDataObject[item] = ""
-    return recentDataObject
-def getWorksheet(workBook):
+        if workSheet.cell(row = i, column = 1).value == stringDatetimeObj:
+            recentDataObject = {
+                # Retrieve clock in time
+                "clockin": str(workSheet.cell(row = i, column = 3).value),
+                # Retrieve clock in time
+                "clockout": str(workSheet.cell(row = i, column = 4).value),
+                # Retrieve branch location
+                "branch": str(workSheet.cell(row = i, column = 13).value),
+                # Retrieve notes location
+                "notes": str(workSheet.cell(row = i, column = 5).value)
+            }
+            for item in recentDataObject:
+                if recentDataObject[item] == "None":
+                    recentDataObject[item] = ""
+            return recentDataObject
+    failedDataObject = {
+                "clockin": "",
+                "clockout": "",
+                "branch": "",
+                "notes": ""
+            }
+    return failedDataObject
+def getWorksheet(workbook):
     # Change the sheet depending on whether we're past payday
     sheetToUse = ""
     if currentTime.day > 25:
         if currentTime.month == 12:
-             sheetToUse = monthArray[0] + " " + currentTime.strftime("%Y")
+             sheetToUse = monthArrayCaps[0] + " " + currentTime.strftime("%Y")
         else:
-            sheetToUse = monthArray[currentTime.month] + " " + currentTime.strftime("%Y")
+            sheetToUse = monthArrayCaps[currentTime.month] + " " + currentTime.strftime("%Y")
     else:
         sheetToUse = currentMonthYear
-    return workBook[sheetToUse]
-# WEBVIEW FUNCTIONS
+    return workbook[sheetToUse]
+
+# EXTRA FUNCTIONS
 def create():
     myWindowWidth = screen_width - 100
     myWindowHeight = screen_height - 100
     xLocation = (screen_width / 2) - (myWindowWidth / 2)
     yLocation = (screen_height / 2) - (myWindowHeight / 2)
     return webview.create_window('Handz Punch Clock', app, width=myWindowWidth, height=myWindowHeight, x=xLocation, y=yLocation)
-def minimize():
-    window.minimize()
-def maximize():
-    window.toggle_fullscreen()
-def close():
-    window.destroy()
-
-# Directory functions (tkinter)
 def openFolderDialog():
     # Hide the main Tkinter window
     root = tk.Tk()
@@ -233,11 +233,22 @@ def openFolderDialog():
         userFolderPath = folder_path
         return userFolderPath
 
+
+
+
+
+
+
+
+
+
+# Startup
 @app.route("/")
 def startup():
     findTeacherNames()
     return render_template('index.html', teacherNames=teacherNames, folder_path=folder_path, teacherNameCount=teacherNameCount, currentBranch=currentBranch)
     
+# Common routes
 @app.route('/update', methods=['POST'])
 def update():
     # Get data from javascript page
@@ -245,15 +256,14 @@ def update():
     scannedName = data.get('owner')
     clockInTime = data.get('var1')
     clockOutTime = data.get('var2')
-    hoursWorked = data.get('var3')
-    branch = data.get('var4')
-    notes = data.get('var5')
+    branch = data.get('var3')
+    notes = data.get('var4')
     # Find user workbook and save data to it
     userWorkbook = findUserTimesheet(scannedName)
     if userWorkbook is not False:
-        if insertPunchTime(getWorksheet(userWorkbook), clockInTime, clockOutTime, hoursWorked, branch, notes):
+        if insertPunchTime(getWorksheet(userWorkbook), clockInTime, clockOutTime, branch, notes):
             try:
-                userWorkbook.save(f"{folder_path}/{scannedName}{namingConventionAdjusted}")
+                userWorkbook.save(f"{folder_path}/★{scannedName}{namingConvention}")
                 return "success"
             except PermissionError:
                 return "fail"
@@ -261,8 +271,6 @@ def update():
                 return f"{e}"
     else:
         return "FileNotFoundError"
-    
-        
 @app.route("/changeDirectory", methods=['POST'])
 def changeDirectory():
     global folder_path 
@@ -274,7 +282,6 @@ def changeDirectory():
         "tnc": teacherNameCount
     }
     return jsonify(mainPageData)
-
 @app.route("/collectFileData", methods=['POST'])
 def collectFileData():
     userWorkbook = findUserTimesheet("Dakota")

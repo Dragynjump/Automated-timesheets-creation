@@ -292,9 +292,8 @@ function updateTimecard() {
         owner: teacherName,
         var1: document.getElementById("dataDisplay1").innerHTML,
         var2: document.getElementById("dataDisplay2").innerHTML,
-        var3: document.getElementById("dataDisplay3").innerHTML,
-        var4: document.getElementById("dataDisplay4").innerHTML,
-        var5: document.getElementById("editableNotesDiv").value
+        var3: document.getElementById("dataDisplay4").innerHTML,
+        var4: document.getElementById("editableNotesDiv").value
     }
     // Send data to Python
     $.ajax({
@@ -332,12 +331,10 @@ function checkRecentData()
            // Assign values of string items
             document.getElementById("recentDataDisplay1").innerHTML = myDataObject.clockin;
             document.getElementById("recentDataDisplay2").innerHTML = myDataObject.clockout;
-            document.getElementById("recentDataDisplay3").innerHTML = myDataObject.hours;
             document.getElementById("recentDataDisplay4").innerHTML = myDataObject.branch;
             document.getElementById("recentDataDisplay5").innerHTML = myDataObject.notes;
             document.getElementById("dataDisplay1").innerHTML = myDataObject.clockin;
             document.getElementById("dataDisplay2").innerHTML = myDataObject.clockout;
-            document.getElementById("dataDisplay3").innerHTML = myDataObject.hours;
             document.getElementById("editableNotesDiv").value = myDataObject.notes;
             // Set clock in/out displays depending on whether the user has clocked in or not
             if (document.getElementById("dataDisplay1").innerHTML == null || document.getElementById("dataDisplay1").innerHTML == "")
