@@ -2,6 +2,7 @@ import datetime as dt
 from datetime import timedelta 
 import os
 import openpyxl as op 
+from openpyxl.utils.datetime import from_excel
 import sys
 from flask import Flask, render_template, request, jsonify
 import webview
@@ -10,10 +11,6 @@ from tkinter import filedialog
 
 """
 CURRENT BUGS
-update route is not returning valid response for some reason
-
-
-
 Hours worked calculated in JavaScript throws a NaN value if the value in the clock in slot is anything other than a valid timestamp
 Needs to change to an empty value
 Indexing into the worksheets has been updated to use less code. It's a little more hardcoded now, so I'll need to keep an eye out
@@ -99,49 +96,26 @@ def insertPunchTime(workSheet, clIn, clOut, brnch, notes):
     # Search for current date and fill in current time for punch clock
     for i in range (1, maxRow + 1):
         if workSheet.cell(row = i, column = 1).value == stringDatetimeObj:
-            # Insert clock in time
-            workSheet.cell(row = i, column = 3).value = clIn
-            # Insert clock out time
-            workSheet.cell(row = i, column = 4).value = clOut
-            # Insert notes
-            workSheet.cell(row = i, column = 5).value = notes
-            # Insert branch location
-            workSheet.cell(row = i, column = 13).value = brnch
+            # Insert values
+            workSheet.cell(row = i, column = 3).value = clIn # Clock in time
+            workSheet.cell(row = i, column = 4).value = clOut # Clock out time
+            workSheet.cell(row = i, column = 13).value = brnch # Branch
+            workSheet.cell(row = i, column = 17).value = notes # Notes
             return True
+        else:
+            # Check if value is a datetime that got converted into a serial number
+            excel_serial_date = workSheet.cell(row = i, column = 1).value
+            python_datetime = ""
+            if isinstance(excel_serial_date, (int, float)):
+                python_datetime = from_excel(excel_serial_date)
+            if python_datetime == stringDatetimeObj:
+                # Insert values
+                workSheet.cell(row = i, column = 3).value = clIn # Clock in time
+                workSheet.cell(row = i, column = 4).value = clOut # Clock out time
+                workSheet.cell(row = i, column = 13).value = brnch # Branch
+                workSheet.cell(row = i, column = 17).value = notes # Notes
+                return True
     return False
-    """
-    # Initialize variables
-    totalWorkHours = 0
-    totalPlusHours = 0
-    totalMinusHours = 0
-    totalDaysWorked = 0
-    # Add totals for all necessary cells and read to correct slots when finished
-    for x in range (6, maxRow + 1):
-            if workSheet.cell(row = x, column = 1).value == "Total":
-                workSheet.cell(row = x, column = 6).value = totalWorkHours
-                workSheet.cell(row = x, column = 7).value = totalPlusHours
-                workSheet.cell(row = x, column = 8).value = totalMinusHours
-                workSheet.cell(row = x, column = 9).value = totalDaysWorked
-                break
-            if workSheet.cell(row = x, column = 6).value is not None:
-                try:
-                    totalWorkHours = totalWorkHours + int(workSheet.cell(row = x, column = 6).value)
-                except ValueError:
-                    print("Not a valid integer: " + str(workSheet.cell(row = x, column = 6).value))
-            if workSheet.cell(row = x, column = 7).value is not None:
-                try:
-                    totalPlusHours = totalPlusHours + int(workSheet.cell(row = x, column = 7).value)
-                except ValueError:
-                    print("Not a valid integer: " + str(workSheet.cell(row = x, column = 6).value))
-            if workSheet.cell(row = x, column = 8).value is not None:
-                try:
-                    totalMinusHours = totalMinusHours + int(workSheet.cell(row = x, column = 8).value)
-                except ValueError:
-                    print("Not a valid integer: " + str(workSheet.cell(row = x, column = 6).value))
-            if workSheet.cell(row = x, column = 9).value is not None:
-                totalDaysWorked = totalDaysWorked + 1
-    return True
-    """
 def findExcelFileInFolder(folder_path, namingConvention):
     # Copy teacher's excel file into openpyxl workbook, then store current sheet into a dataframe
     wb = op.load_workbook(f'{folder_path}/{namingConvention}.xlsx', data_only = True)
@@ -175,19 +149,34 @@ def checkRecentData(workSheet):
     for i in range (1, maxRow + 1):
         if workSheet.cell(row = i, column = 1).value == stringDatetimeObj:
             recentDataObject = {
-                # Retrieve clock in time
+                # Retrieve values
                 "clockin": str(workSheet.cell(row = i, column = 3).value),
-                # Retrieve clock in time
                 "clockout": str(workSheet.cell(row = i, column = 4).value),
-                # Retrieve branch location
                 "branch": str(workSheet.cell(row = i, column = 13).value),
-                # Retrieve notes location
-                "notes": str(workSheet.cell(row = i, column = 5).value)
+                "notes": str(workSheet.cell(row = i, column = 17).value)
             }
             for item in recentDataObject:
                 if recentDataObject[item] == "None":
                     recentDataObject[item] = ""
             return recentDataObject
+        else:
+            # Check if value is a datetime that got converted into a serial number
+            excel_serial_date = workSheet.cell(row = i, column = 1).value
+            python_datetime = ""
+            if isinstance(excel_serial_date, (int, float)):
+                python_datetime = from_excel(excel_serial_date)
+            if python_datetime == stringDatetimeObj:
+                recentDataObject = {
+                # Retrieve values
+                "clockin": str(workSheet.cell(row = i, column = 3).value),
+                "clockout": str(workSheet.cell(row = i, column = 4).value),
+                "branch": str(workSheet.cell(row = i, column = 13).value),
+                "notes": str(workSheet.cell(row = i, column = 17).value)
+                }
+                for item in recentDataObject:
+                    if recentDataObject[item] == "None":
+                        recentDataObject[item] = ""
+                return recentDataObject
     failedDataObject = {
                 "clockin": "",
                 "clockout": "",
@@ -269,6 +258,8 @@ def update():
                 return "fail"
             except Exception as e:
                 return f"{e}"
+        else:
+            return "insertPunchTime returned false"
     else:
         return "FileNotFoundError"
 @app.route("/changeDirectory", methods=['POST'])
@@ -284,7 +275,8 @@ def changeDirectory():
     return jsonify(mainPageData)
 @app.route("/collectFileData", methods=['POST'])
 def collectFileData():
-    userWorkbook = findUserTimesheet("Dakota")
+    data = request.get_json()
+    userWorkbook = findUserTimesheet(data)
     userWorksheet = getWorksheet(userWorkbook)
     recentData = checkRecentData(userWorksheet)
     return jsonify(recentData)

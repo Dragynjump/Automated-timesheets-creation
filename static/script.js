@@ -185,6 +185,7 @@ function loadSecondaryPage()
             </div>
         </div>
         <div id="timesheetBoxesDiv4">
+            <div id="secondaryErrorMessage"></div>
             <div class="timesheetBox", id="newSubmitButtonDiv">
                 <button id="newSubmitButton">SUBMIT</button>
             </div>
@@ -194,7 +195,7 @@ function loadSecondaryPage()
         </div>
     </div>
     `;
-    checkRecentData();
+    collectFileData();
     document.getElementById("employeeName").innerHTML = "Hello, " + teacherName + ".";
     setEventsOnClicked("backButton", loadMainPage);
     setEventsOnClicked("clockIn", clockInButton);
@@ -315,12 +316,12 @@ function updateTimecard() {
         }
     });
 }
-function checkRecentData()
+function collectFileData()
 {
     $.ajax({
         type : "POST",
         url : '/collectFileData',
-        dataType: "json",
+        data: JSON.stringify(teacherName),
         contentType: 'application/json;charset=UTF-8',
         success: function (myDataObject) {
            // Adjust time to not include seconds
