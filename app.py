@@ -18,6 +18,16 @@ for if the worksheets are updated or altered in any way. It could break the code
 Repeatedly clocking out stacks branch names on top of each other repeatedly
 Need to connect to GitHub and create auto-installer
 """
+
+# CHANGE FOR EACH VERSION!!!!!!
+currentBranch = "SK"
+
+# Cell column numbers
+CLOCKINNO = 3
+CLOCKOUTNO = 4
+BRANCHNO = 14
+NOTESNO = 18
+
 # Help PyInstaller determine the base directory for resources
 base_dir = '.'
 if hasattr(sys, '_MEIPASS'):
@@ -59,9 +69,6 @@ formattedDate = currentTime.strftime("%d") + "-" + currentTime.strftime("%m") + 
 stringFormat = "%d-%m-%Y"
 stringDatetimeObj = dt.datetime.strptime(formattedDate, stringFormat)
 
-# CHANGE FOR EACH VERSION!!!!!!
-currentBranch = "SK"
-
 # MAIN FUNCTIONS
 def findTeacherNames():
     try:
@@ -97,10 +104,10 @@ def insertPunchTime(workSheet, clIn, clOut, brnch, notes):
     for i in range (1, maxRow + 1):
         if workSheet.cell(row = i, column = 1).value == stringDatetimeObj:
             # Insert values
-            workSheet.cell(row = i, column = 3).value = clIn # Clock in time
-            workSheet.cell(row = i, column = 4).value = clOut # Clock out time
-            workSheet.cell(row = i, column = 13).value = brnch # Branch
-            workSheet.cell(row = i, column = 17).value = notes # Notes
+            workSheet.cell(row = i, column = CLOCKINNO).value = clIn # Clock in time
+            workSheet.cell(row = i, column = CLOCKOUTNO).value = clOut # Clock out time
+            workSheet.cell(row = i, column = BRANCHNO).value = brnch # Branch
+            workSheet.cell(row = i, column = NOTESNO).value = notes # Notes
             return True
         else:
             # Check if value is a datetime that got converted into a serial number
@@ -110,10 +117,10 @@ def insertPunchTime(workSheet, clIn, clOut, brnch, notes):
                 python_datetime = from_excel(excel_serial_date)
             if python_datetime == stringDatetimeObj:
                 # Insert values
-                workSheet.cell(row = i, column = 3).value = clIn # Clock in time
-                workSheet.cell(row = i, column = 4).value = clOut # Clock out time
-                workSheet.cell(row = i, column = 13).value = brnch # Branch
-                workSheet.cell(row = i, column = 17).value = notes # Notes
+                workSheet.cell(row = i, column = CLOCKINNO).value = clIn # Clock in time
+                workSheet.cell(row = i, column = CLOCKOUTNO).value = clOut # Clock out time
+                workSheet.cell(row = i, column = BRANCHNO).value = brnch # Branch
+                workSheet.cell(row = i, column = NOTESNO).value = notes # Notes
                 return True
     return False
 def findExcelFileInFolder(folder_path, namingConvention):
@@ -150,10 +157,10 @@ def checkRecentData(workSheet):
         if workSheet.cell(row = i, column = 1).value == stringDatetimeObj:
             recentDataObject = {
                 # Retrieve values
-                "clockin": str(workSheet.cell(row = i, column = 3).value),
-                "clockout": str(workSheet.cell(row = i, column = 4).value),
-                "branch": str(workSheet.cell(row = i, column = 13).value),
-                "notes": str(workSheet.cell(row = i, column = 17).value)
+                "clockin": str(workSheet.cell(row = i, column = CLOCKINNO).value),
+                "clockout": str(workSheet.cell(row = i, column = CLOCKOUTNO).value),
+                "branch": str(workSheet.cell(row = i, column = BRANCHNO).value),
+                "notes": str(workSheet.cell(row = i, column = NOTESNO).value)
             }
             for item in recentDataObject:
                 if recentDataObject[item] == "None":
@@ -168,10 +175,10 @@ def checkRecentData(workSheet):
             if python_datetime == stringDatetimeObj:
                 recentDataObject = {
                 # Retrieve values
-                "clockin": str(workSheet.cell(row = i, column = 3).value),
-                "clockout": str(workSheet.cell(row = i, column = 4).value),
-                "branch": str(workSheet.cell(row = i, column = 13).value),
-                "notes": str(workSheet.cell(row = i, column = 17).value)
+                "clockin": str(workSheet.cell(row = i, column = CLOCKINNO).value),
+                "clockout": str(workSheet.cell(row = i, column = CLOCKOUTNO).value),
+                "branch": str(workSheet.cell(row = i, column = BRANCHNO).value),
+                "notes": str(workSheet.cell(row = i, column = NOTESNO).value)
                 }
                 for item in recentDataObject:
                     if recentDataObject[item] == "None":
