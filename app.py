@@ -2,6 +2,7 @@ import datetime as dt
 from datetime import timedelta 
 import os
 import openpyxl as op 
+import pandas as pd
 from openpyxl.utils.datetime import from_excel
 import sys
 from flask import Flask, render_template, request, jsonify
@@ -19,6 +20,15 @@ Repeatedly clocking out stacks branch names on top of each other repeatedly
 Need to connect to GitHub and create auto-installer
 """
 
+
+
+
+
+
+
+
+
+
 # CHANGE FOR EACH VERSION!!!!!!
 currentBranch = "SK"
 
@@ -34,7 +44,6 @@ if hasattr(sys, '_MEIPASS'):
     base_dir = os.path.join(sys._MEIPASS)
 
 # APP DECLARATION
-#app = Flask(__name__, static_folder=os.path.join(base_dir, 'static'), template_folder=os.path.join(base_dir, 'templates'))
 app = Flask(__name__,template_folder="templates")
 
 # Collect screen dimension info
@@ -69,6 +78,16 @@ formattedDate = currentTime.strftime("%d") + "-" + currentTime.strftime("%m") + 
 stringFormat = "%d-%m-%Y"
 stringDatetimeObj = dt.datetime.strptime(formattedDate, stringFormat)
 
+
+
+
+
+
+
+
+
+
+
 # MAIN FUNCTIONS
 def findTeacherNames():
     try:
@@ -91,10 +110,7 @@ def findTeacherNames():
         print("No directory")
 def findUserTimesheet(userName):
     #After username is retrieved, copy teacher's excel file into openpyxl workbook, then store current sheet into a dataframe
-    try:
-        wb = op.load_workbook(f'{folder_path}/★{userName}{namingConvention}', data_only = True)
-    except FileNotFoundError:
-        return False
+    wb = op.load_workbook(f'{folder_path}/★{userName}{namingConvention}', data_only = False)
     return wb
 def insertPunchTime(workSheet, clIn, clOut, brnch, notes):
     # Define variables for cell search (time, rows, columns, etc.)
@@ -191,7 +207,7 @@ def checkRecentData(workSheet):
                 "notes": ""
             }
     return failedDataObject
-def getWorksheet(workbook):
+def getWorksheet():
     # Change the sheet depending on whether we're past payday
     sheetToUse = ""
     if currentTime.day > 25:
@@ -200,8 +216,8 @@ def getWorksheet(workbook):
         else:
             sheetToUse = monthArrayCaps[currentTime.month] + " " + currentTime.strftime("%Y")
     else:
-        sheetToUse = currentMonthYear
-    return workbook[sheetToUse]
+        sheetToUse = monthArrayCaps[currentTime.month - 1] + " " + currentTime.strftime("%Y")
+    return str(sheetToUse)
 
 # EXTRA FUNCTIONS
 def create():
@@ -256,19 +272,19 @@ def update():
     notes = data.get('var4')
     # Find user workbook and save data to it
     userWorkbook = findUserTimesheet(scannedName)
-    if userWorkbook is not False:
-        if insertPunchTime(getWorksheet(userWorkbook), clockInTime, clockOutTime, branch, notes):
-            try:
-                userWorkbook.save(f"{folder_path}/★{scannedName}{namingConvention}")
-                return "success"
-            except PermissionError:
-                return "fail"
-            except Exception as e:
-                return f"{e}"
-        else:
-            return "insertPunchTime returned false"
-    else:
-        return "FileNotFoundError"
+    if userWorkbook is False:
+        return "File not found"
+    if not insertPunchTime(userWorkbook[getWorksheet()], clockInTime, clockOutTime, branch, notes):
+        return "Failed to insert data"
+    try:
+        userWorkbook.save(f"{folder_path}/★{scannedName}{namingConvention}")
+        return "success"
+    except PermissionError:
+        return "fail"
+    except Exception as e:
+        return f"{e}"
+        
+    
 @app.route("/changeDirectory", methods=['POST'])
 def changeDirectory():
     global folder_path 
@@ -284,8 +300,8 @@ def changeDirectory():
 def collectFileData():
     data = request.get_json()
     userWorkbook = findUserTimesheet(data)
-    userWorksheet = getWorksheet(userWorkbook)
-    recentData = checkRecentData(userWorksheet)
+    userWorksheet = getWorksheet()
+    recentData = checkRecentData(userWorkbook[userWorksheet])
     return jsonify(recentData)
 
 if __name__ == '__main__':

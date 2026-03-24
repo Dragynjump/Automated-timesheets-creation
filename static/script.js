@@ -305,7 +305,10 @@ function updateTimecard() {
         success: function(response) {
             errorMessage = document.getElementById("secondaryErrorMessage")
             if (response == "success")
+            {
+                playSound("static/sounds/Success.wav");
                 loadMainPage();
+            }
             else if (response == "fail")
                 errorMessage.innerHTML = "Unable to save data due to Python Permission Error. Please close the file if it is open.";
             else
@@ -467,7 +470,7 @@ function setEventsOnClicked(buttonID, myFunction, argument)
         myFunction(argument);
     });
 }
-// Basic mathematical functions
+// Basic functions
 function isLetter(str)
 {
     return str.toLowerCase() != str.toUpperCase();
@@ -505,4 +508,9 @@ function nameIsInArray(nameToCheck, listToCheck)
             return true;
 
     return false;
+}
+function playSound(soundUrl) {
+  const audio = new Audio(soundUrl);
+  audio.play()
+    .catch(error => console.error("Audio play failed:", error)); // Handle potential autoplay errors
 }
