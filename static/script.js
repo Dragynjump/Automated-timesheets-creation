@@ -141,6 +141,7 @@ function loadSecondaryPage()
         </div>
         <div id="timesheetBoxesDiv1">
             <div class="timesheetBox">
+                <div class="timesheetCell topRow">Transport</div>
                 <div class="timesheetCell topRow">Clock in</div>
                 <div class="timesheetCell topRow">Clock out</div>
                 <div class="timesheetCell topRow">Hours</div>
@@ -148,6 +149,7 @@ function loadSecondaryPage()
                 <div class="timesheetCell topRow lastCell">Notes</div>
             </div>
             <div class="timesheetBox">
+                <div class="timesheetCell bottomRow" id="recentDataDisplay6"></div>
                 <div class="timesheetCell bottomRow" id="recentDataDisplay1"></div>
                 <div class="timesheetCell bottomRow" id="recentDataDisplay2"></div>
                 <div class="timesheetCell bottomRow" id="recentDataDisplay3"></div>
@@ -160,6 +162,7 @@ function loadSecondaryPage()
         </div>
         <div id="timesheetBoxesDiv2">
             <div class="timesheetBox">
+                <div class="timesheetCell topRow">Transport</div>
                 <div class="timesheetCell topRow">Clock in</div>
                 <div class="timesheetCell topRow">Clock out</div>
                 <div class="timesheetCell topRow">Hours</div>
@@ -167,6 +170,13 @@ function loadSecondaryPage()
                 <div class="timesheetCell topRow lastCell">Notes</div>
             </div>
             <div class="timesheetBox">
+                <div class="timesheetCell bottomRow" id="dataDisplay5">
+                    <select class="transportBox">
+                        <option value="train">Train</option>
+                        <option value="car">Car</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
                 <div class="timesheetCell bottomRow" id="dataDisplay1"></div>
                 <div class="timesheetCell bottomRow" id="dataDisplay2"></div>
                 <div class="timesheetCell bottomRow" id="dataDisplay3"></div>
@@ -309,7 +319,7 @@ function updateTimecard() {
                 playSound("static/sounds/Success.wav");
                 loadMainPage();
             }
-            else if (response == "fail")
+            else if (response == "PermissionError")
                 errorMessage.innerHTML = "Unable to save data due to Python Permission Error. Please close the file if it is open.";
             else
                 errorMessage.innerHTML = "Unable to save data due to Python error: " + response + ". Please contact site manager.";

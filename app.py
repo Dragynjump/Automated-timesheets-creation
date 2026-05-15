@@ -11,13 +11,12 @@ import tkinter as tk
 from tkinter import filedialog
 
 """
+NEXT STEP
+-Auto calculate the total hours and prompt for a message in notes
+-Allow the user to insert their transportation type (default to their usual)
+-Change to use QR codes
 CURRENT BUGS
-Hours worked calculated in JavaScript throws a NaN value if the value in the clock in slot is anything other than a valid timestamp
-Needs to change to an empty value
-Indexing into the worksheets has been updated to use less code. It's a little more hardcoded now, so I'll need to keep an eye out
-for if the worksheets are updated or altered in any way. It could break the code.
 Repeatedly clocking out stacks branch names on top of each other repeatedly
-Need to connect to GitHub and create auto-installer
 """
 
 
@@ -108,7 +107,7 @@ def findTeacherNames():
                     teacherNameCount = teacherNameCount + 1
     except FileNotFoundError:
         print("No directory")
-def findUserTimesheet(userName):
+def findUserWorkbook(userName):
     #After username is retrieved, copy teacher's excel file into openpyxl workbook, then store current sheet into a dataframe
     wb = op.load_workbook(f'{folder_path}/★{userName}{namingConvention}', data_only = False)
     return wb
@@ -258,7 +257,8 @@ def openFolderDialog():
 @app.route("/")
 def startup():
     findTeacherNames()
-    return render_template('index.html', teacherNames=teacherNames, folder_path=folder_path, teacherNameCount=teacherNameCount, currentBranch=currentBranch)
+    return render_template('index.html', teacherNames=teacherNames, folder_path=folder_path, 
+                           teacherNameCount=teacherNameCount, currentBranch=currentBranch)
     
 # Common routes
 @app.route('/update', methods=['POST'])
@@ -270,21 +270,25 @@ def update():
     clockOutTime = data.get('var2')
     branch = data.get('var3')
     notes = data.get('var4')
-    # Find user workbook and save data to it
-    userWorkbook = findUserTimesheet(scannedName)
+    # Find user workbook and error check
+    userWorkbook = findUserWorkbook(scannedName)
     if userWorkbook is False:
         return "File not found"
-    if not insertPunchTime(userWorkbook[getWorksheet()], clockInTime, clockOutTime, branch, notes):
+    # Find user worksheet and error check
+    userWorksheet = getWorksheet()
+    if userWorksheet is False:
+        return "Worksheet within file not found"
+    # Attempt to insert punch time, return if failed
+    if not insertPunchTime(userWorkbook[userWorksheet], clockInTime, clockOutTime, branch, notes):
         return "Failed to insert data"
+    # Attempt to save workbook, return if failed
     try:
         userWorkbook.save(f"{folder_path}/★{scannedName}{namingConvention}")
         return "success"
     except PermissionError:
-        return "fail"
+        return "PermissionError"
     except Exception as e:
-        return f"{e}"
-        
-    
+        return f"{e}" 
 @app.route("/changeDirectory", methods=['POST'])
 def changeDirectory():
     global folder_path 
@@ -299,7 +303,7 @@ def changeDirectory():
 @app.route("/collectFileData", methods=['POST'])
 def collectFileData():
     data = request.get_json()
-    userWorkbook = findUserTimesheet(data)
+    userWorkbook = findUserWorkbook(data)
     userWorksheet = getWorksheet()
     recentData = checkRecentData(userWorkbook[userWorksheet])
     return jsonify(recentData)

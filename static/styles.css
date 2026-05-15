@@ -286,7 +286,7 @@ html, body {
 }
 
 #punchButtons {
-  width: 604px;
+  width: 504px;
   display: flex;
   justify-content: flex-start;
 }
@@ -361,6 +361,19 @@ html, body {
 }
 
 #editableNotesDiv:focus {
+  outline: none;
+}
+
+.transportBox {
+  height: 100%;
+  width: 100%;
+  font-size: 110%;
+  border: none;
+  text-align-last: center;
+  text-align: center; 
+}
+
+.transportBox:focus {
   outline: none;
 }
 
