@@ -170,11 +170,12 @@ function loadSecondaryPage()
                 <div class="timesheetCell topRow lastCell">Notes</div>
             </div>
             <div class="timesheetBox">
-                <div class="timesheetCell bottomRow" id="dataDisplay5">
-                    <select class="transportBox">
-                        <option value="train">Train</option>
-                        <option value="car">Car</option>
-                        <option value="other">Other</option>
+                <div class="timesheetCell bottomRow">
+                    <select class="transportBox" id="dataDisplay6">
+                        <option value=""></option>
+                        <option value="Train">Train</option>
+                        <option value="Car">Car</option>
+                        <option value="Other">Other</option>
                     </select>
                 </div>
                 <div class="timesheetCell bottomRow" id="dataDisplay1"></div>
@@ -298,13 +299,17 @@ function timeTableUpdate(theButton1, theButton2, theDataDisplay1, theDataDisplay
     document.getElementById("newSubmitButton").innerHTML = message;
 }
 function updateTimecard() {
+    //Access value from select box for transport dropdown
+    let selectElement = document.getElementById("dataDisplay6");
+    let selectedOption = selectElement.options[selectElement.selectedIndex];
     // Store punch data in JSON object
     const dataToSend = {
         owner: teacherName,
         var1: document.getElementById("dataDisplay1").innerHTML,
         var2: document.getElementById("dataDisplay2").innerHTML,
         var3: document.getElementById("dataDisplay4").innerHTML,
-        var4: document.getElementById("editableNotesDiv").value
+        var4: document.getElementById("editableNotesDiv").value,
+        var5: selectedOption.value
     }
     // Send data to Python
     $.ajax({
@@ -347,6 +352,7 @@ function collectFileData()
             document.getElementById("recentDataDisplay2").innerHTML = myDataObject.clockout;
             document.getElementById("recentDataDisplay4").innerHTML = myDataObject.branch;
             document.getElementById("recentDataDisplay5").innerHTML = myDataObject.notes;
+            document.getElementById("recentDataDisplay6").innerHTML = myDataObject.transport;
             document.getElementById("dataDisplay1").innerHTML = myDataObject.clockin;
             document.getElementById("dataDisplay2").innerHTML = myDataObject.clockout;
             document.getElementById("editableNotesDiv").value = myDataObject.notes;

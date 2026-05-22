@@ -16,7 +16,6 @@ NEXT STEP
 -Allow the user to insert their transportation type (default to their usual)
 -Change to use QR codes
 CURRENT BUGS
-Repeatedly clocking out stacks branch names on top of each other repeatedly
 """
 
 
@@ -34,6 +33,7 @@ currentBranch = "SK"
 # Cell column numbers
 CLOCKINNO = 3
 CLOCKOUTNO = 4
+TRANSPORTNO = 12
 BRANCHNO = 14
 NOTESNO = 18
 
@@ -111,7 +111,7 @@ def findUserWorkbook(userName):
     #After username is retrieved, copy teacher's excel file into openpyxl workbook, then store current sheet into a dataframe
     wb = op.load_workbook(f'{folder_path}/★{userName}{namingConvention}', data_only = False)
     return wb
-def insertPunchTime(workSheet, clIn, clOut, brnch, notes):
+def insertPunchTime(workSheet, clIn, clOut, brnch, notes, transport):
     # Define variables for cell search (time, rows, columns, etc.)
     maxRow = workSheet.max_row
 
@@ -123,6 +123,8 @@ def insertPunchTime(workSheet, clIn, clOut, brnch, notes):
             workSheet.cell(row = i, column = CLOCKOUTNO).value = clOut # Clock out time
             workSheet.cell(row = i, column = BRANCHNO).value = brnch # Branch
             workSheet.cell(row = i, column = NOTESNO).value = notes # Notes
+            if transport != "":
+                workSheet.cell(row = i, column = TRANSPORTNO).value = transport # Transportation
             return True
         else:
             # Check if value is a datetime that got converted into a serial number
@@ -136,6 +138,8 @@ def insertPunchTime(workSheet, clIn, clOut, brnch, notes):
                 workSheet.cell(row = i, column = CLOCKOUTNO).value = clOut # Clock out time
                 workSheet.cell(row = i, column = BRANCHNO).value = brnch # Branch
                 workSheet.cell(row = i, column = NOTESNO).value = notes # Notes
+                if transport != "":
+                    workSheet.cell(row = i, column = TRANSPORTNO).value = transport # Transportation
                 return True
     return False
 def findExcelFileInFolder(folder_path, namingConvention):
@@ -175,7 +179,8 @@ def checkRecentData(workSheet):
                 "clockin": str(workSheet.cell(row = i, column = CLOCKINNO).value),
                 "clockout": str(workSheet.cell(row = i, column = CLOCKOUTNO).value),
                 "branch": str(workSheet.cell(row = i, column = BRANCHNO).value),
-                "notes": str(workSheet.cell(row = i, column = NOTESNO).value)
+                "notes": str(workSheet.cell(row = i, column = NOTESNO).value),
+                "transport": str(workSheet.cell(row = i, column = TRANSPORTNO).value)
             }
             for item in recentDataObject:
                 if recentDataObject[item] == "None":
@@ -193,7 +198,8 @@ def checkRecentData(workSheet):
                 "clockin": str(workSheet.cell(row = i, column = CLOCKINNO).value),
                 "clockout": str(workSheet.cell(row = i, column = CLOCKOUTNO).value),
                 "branch": str(workSheet.cell(row = i, column = BRANCHNO).value),
-                "notes": str(workSheet.cell(row = i, column = NOTESNO).value)
+                "notes": str(workSheet.cell(row = i, column = NOTESNO).value),
+                "transport": str(workSheet.cell(row = i, column = TRANSPORTNO).value)
                 }
                 for item in recentDataObject:
                     if recentDataObject[item] == "None":
@@ -203,7 +209,8 @@ def checkRecentData(workSheet):
                 "clockin": "",
                 "clockout": "",
                 "branch": "",
-                "notes": ""
+                "notes": "",
+                "transport": ""
             }
     return failedDataObject
 def getWorksheet():
@@ -270,6 +277,8 @@ def update():
     clockOutTime = data.get('var2')
     branch = data.get('var3')
     notes = data.get('var4')
+    transport = data.get('var5')
+    print(f"Transport is: {transport}")
     # Find user workbook and error check
     userWorkbook = findUserWorkbook(scannedName)
     if userWorkbook is False:
@@ -279,7 +288,7 @@ def update():
     if userWorksheet is False:
         return "Worksheet within file not found"
     # Attempt to insert punch time, return if failed
-    if not insertPunchTime(userWorkbook[userWorksheet], clockInTime, clockOutTime, branch, notes):
+    if not insertPunchTime(userWorkbook[userWorksheet], clockInTime, clockOutTime, branch, notes, transport):
         return "Failed to insert data"
     # Attempt to save workbook, return if failed
     try:
